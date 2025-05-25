@@ -3,16 +3,16 @@ module ALU(
     input  rst,
 
     input [7:0]  A_input,
-    input [7:0]  X_reg1,    // Input 3*8bit elemments 
+    input [7:0]  X_reg1,    // Input 4*8bit elemments 
     input [7:0]  X_reg2,
-    input [7:0]  X_reg3,  
+    input [7:0]  X_reg3, 
+    input [7:0]  X_reg4, 
     input        ALU_en,    
     input  [1:0 ] col_counter,
     output [19:0] MU1,     // output result for each mul-sum product seperately
     output [19:0] MU2,
     output [19:0] MU3,
     output [19:0] MU4,     // output result for each mul-sum product seperately
-                          // output result for each mul-sum product seperately
     output [3:0] rom_addr,     // Read coe from the ROM to the ALU, calculate the address to indicate the coe that the ROM need.     
     output web 
 );  
@@ -70,6 +70,8 @@ module ALU(
         end
         else begin
             // Finish the multiply and back to controller IDLE. Prepare to next input matrix.
+            counter_next = 0;
+            // Reset the MU registers.
             MU1_next = 18'b0; MU2_next = 18'b0; MU3_next = 18'b0; MU4_next = 18'b0; 
         end
     end 

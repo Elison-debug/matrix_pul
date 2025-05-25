@@ -3,7 +3,7 @@
 `define ACC_END_VALUE              32'd0    // disable clock gating
 module acc_top
 #(
-    parameter APB_ADDR_WIDTH = 12  //APB slaves are 4KB by default
+    parameter APB_ADDR_WIDTH = 13  //APB slaves are 4KB by default
 )(
     input                        HCLK,
     input                        HRESETn,
@@ -40,17 +40,8 @@ clock_gate clk_gate_inst (
 // output mux
 reg pslverr;
 reg [31:0] prdata;
-always @(*) begin
-    if (PSEL != 1'b0)
-        begin
-            PRDATA = prdata;
-            PSLVERR = pslverr;
-        end
-    else begin
-            PRDATA = 32'0;
-            PSLVERR = 1'b0;
-        end
-end
+assign PRDATA   = PSEL ? prdata : 32'b0;
+assign PSELVERR = PSEL ? pslverr : 1'b0;
 
   // Internal signals
   wire load_done;
@@ -71,7 +62,7 @@ end
 
   logic_top 
   #(
-    .APB_ADDR_WIDTH(12)
+    .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
   ) 
     logic_top_inst 
   (

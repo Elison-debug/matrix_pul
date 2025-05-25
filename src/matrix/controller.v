@@ -30,11 +30,10 @@ module controller(
     reg [7:0] count_next;
 
     reg [1:0] shift_count;
-    reg [1:0] shift_count_next;
+    wire [1:0] shift_count_next;
 
     assign col_counter = count[1:0];
     assign acc_finish  = (count == cal_times) ? 1'b0 : 1'b1;
-    assign count_next  = load_done ? (count + 1'b1) : count;
     assign shift_count_next = (fsm_state == shift_data) ? (shift_count + 1'b1) : shift_count;
 
     //enable signals
@@ -59,11 +58,10 @@ end
 
 //FSM for calculate
 always @(*) begin
-    count_next = count;
     state_next = state;
     //update state
     case (state) 
-        IDLE        : begin state_next = start_in   ? load_data : IDLE; count_next = 5'b0; end //if start_in = 1 start load_data
+        IDLE        : begin state_next = start_in   ? load_data : IDLE; end //if start_in = 1 start load_data
         load_data   : begin state_next = load_done  ? calculate : load_data;   end  //load data to ALU
         calculate   : begin state_next = cal_finish ? shift_data: calculate;   end  //if calculation finished start load next row
         shift_data  : begin state_next = load_done  ? next_col  : calculate; end  //if data loaded shift data to ALU
@@ -71,5 +69,16 @@ always @(*) begin
         default     : state_next = IDLE;
     endcase 
 end
+
+//counter logic
+always @(*) begin
+    count_next = count;
+    if(load_done)
+        count_next = 5'b0;
+    else begin
+        count_next  = load_done ? (count + 1'b1) : count;
+    end
+end
+
 
 endmodule

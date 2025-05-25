@@ -1,5 +1,5 @@
 module sram_mem#(
-    parameter APB_ADDR_WIDTH = 12  //APB slaves are 4KB by default
+    parameter APB_ADDR_WIDTH = 13  //acc sram are 8KB by default
 )(
     input                           clk,
     input                           rst,  
