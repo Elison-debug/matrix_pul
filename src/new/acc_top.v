@@ -53,8 +53,8 @@ assign PSLVERR  = 1'b0;
       .rst           ( rst          ),
       .start_in      ( start_in     ),
       .load_done     ( load_done    ),
-      .cal_finish    ( web          ),// when web, a sub calculation is finished
-      .shift_counter ( shift_count     ),
+      .cal_finish    (            ),// when web, a sub calculation is finished
+      .shift_counter ( shift_count  ),
       .acc_counter   ( acc_counter  ),
       .ALU_en        ( ALU_en       ),
       .acc_finish    ( acc_finish   ),
@@ -69,51 +69,44 @@ wire [17:0] 	MU3;
 wire [17:0] 	MU4;
 
 wire [7:0]   	A_input;
-wire [3:0]    rom_addr;
+wire [3:0]      rom_addr;
+// input matrix wire
+wire [63:0] 	X_reg;
+
 
 ALU u_ALU(
 	.clk       	( clk        ),
 	.rst       	( rst        ),
 	.A_input   	( A_input    ),
 	.ALU_en     ( ALU_en     ),
-	.X_reg1    	( X_reg1     ),
-	.X_reg2    	( X_reg2     ),
-	.X_reg3    	( X_reg3     ),
-	.X_reg4    	( X_reg4     ),
+	.X_reg    	( X_reg      ),
 	.MU1       	( MU1        ),
 	.MU2       	( MU2        ),
 	.MU3       	( MU3        ),
 	.MU4       	( MU4        ),
 	.web        ( web        ),
-  .addr_offset( addr_offset   )
+    .addr_offset( addr_offset)
 );
 
 A_rom u_A_rom(
 	.clk     	( clk       ),
 	.rst     	( rst       ),
-	.rom_addr ( rom_addr  ),
+	.rom_addr   ( rom_addr  ),
 	.A_input 	( A_input   )
 );
 
-// input matrix wire
-wire [63:0] 	X_reg1;
-wire [63:0] 	X_reg2;
-wire [63:0] 	X_reg3;
-wire [63:0] 	X_reg4;
+
 
 X_buffer u_X_buffer(
 	.clk           	( clk            ),
 	.rst           	( rst            ),
 	.valid_input   	( valid_input    ),
-	.load_en 	      ( load_en        ),
-  .X_shift       	( ALU_en         ),
+	.load_en 	    ( load_en        ),
+    .X_shift       	( ALU_en         ),
 	.X_load        	( PWDATA         ),
-  .shift_count     ( shift_count    ),
+    .shift_count    ( shift_count    ),
 	.acc_counter    ( acc_counter    ),
-	.X_reg1        	( X_reg1         ),
-	.X_reg2        	( X_reg2         ),
-	.X_reg3        	( X_reg3         ),
-	.X_reg4        	( X_reg4         ),
+	.X_reg        	( X_reg          ),
 	.load_done    	( load_done      )
 );
 

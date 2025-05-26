@@ -3,13 +3,11 @@ module X_buffer#(
 )(
     input  clk,
     input  rst,
-    input  valid_input,
+    input  ALU_en, //En shift buffer
     input  load_en,
-    input  X_shift, 
+    input  valid_input,
     input  [32:0] X_load,    //input data
-    input  [3 :0] shift_count,
-    input  [7 :0] acc_counter,
-    output [7:0] col_counter,
+    input  [1 :0] row_counter,
     output [55:0] X_reg,
     output load_done
 );
@@ -18,21 +16,19 @@ module X_buffer#(
     reg [2:0] count_next;
 
     // four X buffer
-    reg [71:0] s_reg [2:0];
-    reg [71:0] s_reg_next [2:0];
+    reg [243:0] s_reg [3:0];
+    reg [243:0] s_reg_next [3:0];
 
     //last column of a row flag
     wire   first_col;
     assign first_col = (col_counter == 3'b000) ? 1'b1 : 1'b0;
-
-    //load done flag
-    assign load_done = count == 3'b111;
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
         s_reg[0]   <= 72'b0;
         s_reg[1]   <= 72'b0;
         s_reg[2]   <= 72'b0;
+        s_reg[3]   <= 72'b0;
         count       <= 3'b0;
     end
     else begin
@@ -41,36 +37,41 @@ always @(posedge clk or negedge rst) begin
         s_reg[0]   <= s_reg_next[0];
         s_reg[1]   <= s_reg_next[1];
         s_reg[2]   <= s_reg_next[2];
+        s_reg[3]   <= s_reg_next[3];
     end
 end
 
 //buffer load
 always @(*) begin
-    count_next     = count;
+    count_next       = count;
     s_reg_next[0]    = s_reg[0];
     s_reg_next[1]    = s_reg[1];
     s_reg_next[2]    = s_reg[2];
-    //default case, do nothing
+    s_reg_next[3]    = s_reg[3];
     if(load_en && valid_input)begin
-        case(col_counter)
-            3'b000 : begin 
-                    s_reg_next[0] = {8'b0,s_reg[0][31:0] , X_load} ; 
-                    count_next = count + 3'd1 ;  
+        case(row_counter)
+            2'b00 : begin 
+                    s_reg_next[0] = {s_reg[0][207:0] , X_load} ; 
                  end 
-            3'b111 : begin
-                    count_next = count;  
+            2'b01 : begin 
+                    s_reg_next[1] = {s_reg[1][207:0] , X_load} ; 
+                 end
+            2'b10 : begin 
+                    s_reg_next[2] = {s_reg[2][207:0] , X_load} ; 
+                 end
+            2'b11 : begin 
+                    s_reg_next[3] = {s_reg[3][207:0] , X_load} ; 
                  end
             default : begin
-                    s_reg_next[0] = {s_reg[0][55:32] , X_load} ; 
-                    //s_reg_next[0][31:0] = X_load; 
-                    count_next = count + 3'd1 ;  
+                    count_next = count;  
             end
         endcase
+        count_next = count +1'b1;  
     end 
-    else if(X_shift) begin
-        s_reg_next[0] = {s_reg[0][63:0] , s_reg[0][71:64]};
-        s_reg_next[1] = {s_reg[1][63:0] , s_reg[1][71:64]};
-        s_reg_next[2] = {s_reg[2][63:0] , s_reg[2][71:64]};
+    else if(ALU_en) begin
+        s_reg_next[row_counter]       = {s_reg[0][215:0] , s_reg[0][243:216]};
+        s_reg_next[row_counter+2'b1]  = {s_reg[1][215:0] , s_reg[1][243:216]};
+        s_reg_next[row_counter+2'b11] = {s_reg[2][215:0] , s_reg[2][243:216]};
     end
 end
 
