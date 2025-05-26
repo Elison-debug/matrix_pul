@@ -3,9 +3,9 @@ module X_buffer(
     input  rst,
     input  valid_input,
     input  load_en,
-    input  rom_addr,
-    input  [32:0] X_load,    //iniput data
-    input  [2 :0] col_counter,
+    input  [32:0] X_load,    //input data
+    input  X_shift, 
+    input  [7 :0] acc_counter,
     
     output [7:0] X_reg1,
     output [7:0] X_reg2,
@@ -26,13 +26,14 @@ module X_buffer(
     assign X_reg1 = s_reg1 [0] [71:56];
     assign X_reg2 = s_reg1 [1] [71:56];
     assign X_reg3 = s_reg1 [2] [71:56];
+    assign X_reg4 = s_reg1 [0] [55:48]; 
 
     //last column of a row flag
     wire   first_col;
     assign first_col = (col_counter == 3'b000) ? 1'b1 : 1'b0;
 
     //load done flag
-    assign load_done = first_col ? (count == 'b0) : (count == 3'b111);
+    assign load_done = count == 3'b111;
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
@@ -50,7 +51,7 @@ always @(posedge clk or negedge rst) begin
     end
 end
 
-//shift buffer
+//buffer load
 always @(*) begin
     count_next     = count;
     s_reg1_next[0]    = s_reg1[0];
@@ -72,11 +73,43 @@ always @(*) begin
                     count_next = count + 3'd1 ;  
             end
         endcase
-    end else if(X_shift) begin
-        s_reg1_next[0] = {s_reg1[0][63:24] , s_reg1[0][71:64]};
-        s_reg1_next[1] = {s_reg1[0][63:24] , s_reg1[0][71:64]};
-        s_reg1_next[2] = {s_reg1[0][63:24] , s_reg1[0][71:64]};
-    end
+    end 
+end
+
+//shift buffer
+always @(*) begin
+        case(rom_addr)
+            4'b0000 : begin 
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [0] [71:40];
+                 end 
+            4'b0001 : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [0] [55:32];
+                 end
+            4'b0010 : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [0] [47:24];
+                 end
+            4'b0011 : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [1] [71:40];
+                 end
+            4'b0100 : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [1] [55:32];
+                 end
+            4'b0101 : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [1] [47:24];
+                 end
+            4'b0110 : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [2] [71:40];
+                 end
+            4'b0111 : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [2] [55:32];
+                 end
+            4'b1000 : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [2] [47:24];
+                 end        
+            default : begin
+                    {X_reg1,X_reg2,X_reg3,X_reg4} = 32'b0; 
+            end
+        endcase
 end
 
 

@@ -6,7 +6,7 @@ module logic_top#(
 	input  read_n,
 	input  ALU_en,
 	input  [31:0] PWDATA,
-	input  [1 :0] col_counter,
+	input  [7 :0] acc_counter,
 	input  load_en,
 	input  [APB_ADDR_WIDTH-1:0] r_addr,
     input  valid_input,
@@ -16,6 +16,29 @@ module logic_top#(
 	output [31:0] data_out,
     output load_done
 );
+// outports wire
+wire [17:0] 	MU1;
+wire [17:0] 	MU2;
+wire [17:0] 	MU3;
+wire [17:0] 	MU4;
+
+ALU u_ALU(
+	.clk       	( clk        ),
+	.rst       	( rst        ),
+	.A_input   	( A_input    ),
+	.ALU_en     ( ALU_en     ),
+	.X_reg1    	( X_reg1     ),
+	.X_reg2    	( X_reg2     ),
+	.X_reg3    	( X_reg3     ),
+	.X_reg4    	( X_reg4     ),
+	.MU1       	( MU1        ),
+	.MU2       	( MU2        ),
+	.MU3       	( MU3        ),
+	.MU4       	( MU4        ),
+	.web        ( web        ),
+    .rom_addr   ( rom_addr   )
+);
+
 
 // outports wire
 wire [7:0]   	A_input;
@@ -39,41 +62,14 @@ X_buffer u_X_buffer(
 	.rst           	( rst            ),
 	.valid_input   	( valid_input    ),
 	.load_en 	    ( load_en        ),
-	.rom_addr       ( rom_addr        ),
+	.rom_addr       ( rom_addr       ),
 	.X_load        	( PWDATA         ),
-	.col_counter    ( col_counter    ),
+	.acc_counter    ( acc_counter    ),
 	.X_reg1        	( X_reg1         ),
 	.X_reg2        	( X_reg2         ),
 	.X_reg3        	( X_reg3         ),
 	.X_reg4        	( X_reg4         ),
 	.load_done    	( load_done      )
-);
-
-
-
-
-// outports wire
-wire [17:0] 	MU1;
-wire [17:0] 	MU2;
-wire [17:0] 	MU3;
-wire [17:0] 	MU4;
-
-ALU u_ALU(
-	.clk       	( clk        ),
-	.rst       	( rst        ),
-	.A_input   	( A_input    ),
-	.col_counter( col_counter),
-	.ALU_en     ( ALU_en     ),
-	.X_reg1    	( X_reg1     ),
-	.X_reg2    	( X_reg2     ),
-	.X_reg3    	( X_reg3     ),
-	.X_reg4    	( X_reg4     ),
-	.MU1       	( MU1        ),
-	.MU2       	( MU2        ),
-	.MU3       	( MU3        ),
-	.MU4       	( MU4        ),
-	.web        ( web        ),
-    .rom_addr   ( rom_addr   )
 );
 
 

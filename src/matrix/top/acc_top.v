@@ -41,19 +41,19 @@ clock_gate clk_gate_inst (
 reg pslverr;
 reg [31:0] prdata;
 assign PRDATA   = PSEL ? prdata : 32'b0;
-assign PSELVERR = PSEL ? pslverr : 1'b0;
+//assign PSELVERR = PSEL ? pslverr : 1'b0;
+assign PSLVERR  = 1'b0;
 
   // Internal signals
   wire load_done;
-
-
   controller controller_inst (
       .clk           ( clk          ),
       .rst           ( HRESETn      ),
       .start_in      ( start_in     ),
       .load_done     ( load_done    ),
       .cal_finish    ( cal_finish   ),
-      .col_counter   ( col_counter  ),
+      .shift_data_en ( shift_data_en),
+      .acc_counter   ( acc_counter  ),
       .ALU_en        ( ALU_en       ),
       .acc_finish    ( acc_finish   ),
       .pready        ( PREADY       ),
@@ -70,10 +70,11 @@ assign PSELVERR = PSEL ? pslverr : 1'b0;
       .rst           ( HRESETn      ),  
       .read_n        ( read_n       ),
       .ALU_en        ( ALU_en       ),
+      
       .load_en       ( load_en      ),
       .r_addr        ( PADDR        ),
       .PWDATA        ( PWDATA       ),
-      .col_counter   ( col_counter  ),   
+      .acc_counter   ( acc_counter  ),   
       .valid_input   ( write_n      ),
       .load_done     ( load_done    ),
       .cal_finish    ( cal_finish   ),

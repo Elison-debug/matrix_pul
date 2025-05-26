@@ -7,7 +7,7 @@ module X_buffer(
     //input  ram_en,
     input  X_shift,
     
-    output [7:0] X_reg1,
+    output [47:0] X_reg1,
     output [7:0] X_reg2,
     output [7:0] X_reg3,
     output [7:0] X_reg4,
