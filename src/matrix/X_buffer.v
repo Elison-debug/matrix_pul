@@ -1,116 +1,76 @@
-module X_buffer(
+module X_buffer#(
+    parameter APB_ADDR_WIDTH = 13  //APB slaves are 4KB by default
+)(
     input  clk,
     input  rst,
-    input  valid_input,
+    input  ALU_en, //En shift buffer
     input  load_en,
+    input  valid_input,
     input  [32:0] X_load,    //input data
-    input  X_shift, 
-    input  [7 :0] acc_counter,
-    
-    output [7:0] X_reg1,
-    output [7:0] X_reg2,
-    output [7:0] X_reg3, 
-    output [7:0] X_reg4, // output data
+    input  [1 :0] row_counter,
+    output [23:0] X_reg1,  
+    output [23:0] X_reg2,
+    output [23:0] X_reg3,
     output load_done
 );
     //counter
-    reg [2:0] count;
-    reg [2:0] count_next;
-
+    reg [3:0] count;
+    reg [3:0] count_next;
+    assign load_done = (count == 4'd27) ? 1'b1 : 1'b0;
     // four X buffer
-    reg [71:0] s_reg1 [2:0];
-    reg [71:0] s_reg1_next [2:0];
-
-    
-    // X buffer output
-    assign X_reg1 = s_reg1 [0] [71:56];
-    assign X_reg2 = s_reg1 [1] [71:56];
-    assign X_reg3 = s_reg1 [2] [71:56];
-    assign X_reg4 = s_reg1 [0] [55:48]; 
-
-    //last column of a row flag
-    wire   first_col;
-    assign first_col = (col_counter == 3'b000) ? 1'b1 : 1'b0;
-
-    //load done flag
-    assign load_done = count == 3'b111;
+    reg [243:0] s_reg [3:0];
+    reg [243:0] s_reg_next [3:0];
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
-        s_reg1[0]   <= 72'b0;
-        s_reg1[1]   <= 72'b0;
-        s_reg1[2]   <= 72'b0;
+        s_reg[0]   <= 72'b0;
+        s_reg[1]   <= 72'b0;
+        s_reg[2]   <= 72'b0;
+        s_reg[3]   <= 72'b0;
         count       <= 3'b0;
     end
     else begin
         //update counter
-        count       <= count_next;
-        s_reg1[0]   <= s_reg1_next[0];
-        s_reg1[1]   <= s_reg1_next[1];
-        s_reg1[2]   <= s_reg1_next[2];
+        count      <= count_next;
+        s_reg[0]   <= s_reg_next[0];
+        s_reg[1]   <= s_reg_next[1];
+        s_reg[2]   <= s_reg_next[2];
+        s_reg[3]   <= s_reg_next[3];
     end
 end
 
 //buffer load
 always @(*) begin
-    count_next     = count;
-    s_reg1_next[0]    = s_reg1[0];
-    s_reg1_next[1]    = s_reg1[1];
-    s_reg1_next[2]    = s_reg1[2];
-    //default case, do nothing
+    count_next       = count;
+    s_reg_next[0]    = s_reg[0];
+    s_reg_next[1]    = s_reg[1];
+    s_reg_next[2]    = s_reg[2];
+    s_reg_next[3]    = s_reg[3];
     if(load_en && valid_input)begin
-        case(col_counter)
-            3'b000 : begin 
-                    s_reg1_next[0] = {8'b0,s_reg1[0][31:0] , X_load} ; 
-                    count_next = count + 3'd1 ;  
+        case(row_counter)
+            2'b00 : begin 
+                    s_reg_next[1] = {8'b0, s_reg[0][191:16], X_load, 8'b0}; 
                  end 
-            3'b111 : begin
+            2'b01 : begin 
+                    s_reg_next[2] = {8'b0, s_reg[0][191:16], X_load, 8'b0}; 
+                 end
+            2'b10 : begin 
+                    s_reg_next[3] = {8'b0, s_reg[0][191:16], X_load, 8'b0}; 
+                 end
+            2'b11 : begin 
+                    s_reg_next[0] = {8'b0, s_reg[0][191:16], X_load, 8'b0}; 
+                 end
+            default : begin
                     count_next = count;  
-                 end
-            default : begin
-                    s_reg1_next[0] = {s_reg1[0][55:32] , X_load} ; 
-                    //s_reg1_next[0][31:0] = X_load; 
-                    count_next = count + 3'd1 ;  
             end
         endcase
+        count_next = count +1'b1;  
     end 
+    else if(ALU_en) begin
+        s_reg_next[row_counter+2'b00] = {s_reg[row_counter+2'b00][215:0] , s_reg[row_counter+2'b00][243:216]};
+        s_reg_next[row_counter+2'b01] = {s_reg[row_counter+2'b01][215:0] , s_reg[row_counter+2'b01][243:216]};
+        s_reg_next[row_counter+2'b11] = {s_reg[row_counter+2'b11][215:0] , s_reg[row_counter+2'b11][243:216]};
+    end
 end
-
-//shift buffer
-always @(*) begin
-        case(rom_addr)
-            4'b0000 : begin 
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [0] [71:40];
-                 end 
-            4'b0001 : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [0] [55:32];
-                 end
-            4'b0010 : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [0] [47:24];
-                 end
-            4'b0011 : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [1] [71:40];
-                 end
-            4'b0100 : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [1] [55:32];
-                 end
-            4'b0101 : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [1] [47:24];
-                 end
-            4'b0110 : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [2] [71:40];
-                 end
-            4'b0111 : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [2] [55:32];
-                 end
-            4'b1000 : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = s_reg1 [2] [47:24];
-                 end        
-            default : begin
-                    {X_reg1,X_reg2,X_reg3,X_reg4} = 32'b0; 
-            end
-        endcase
-end
-
 
 endmodule

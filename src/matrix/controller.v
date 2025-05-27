@@ -2,81 +2,88 @@ module controller(
     input  clk,
     input  rst,
     input  start_in,
+    input  load_A_done,
     input  load_done,
-    input  cal_finish, 
 
     output ALU_en,
-    output pready,
     output load_en,
+    output load_A_en,
     output row_finish,
     output acc_finish, 
-    output shift_data_en,
-    output acc_counter
+    output [4:0] col_count,
+    output [1:0] row_count
 );  
-    //FSM state
-    parameter IDLE        = 2'b000;
-    parameter load_data   = 2'b001;
-    parameter calculate   = 2'b010;
-    //parameter shift_data  = 2'b011;
-    parameter next_col    = 2'b111;
-    parameter next_row    = 2'b101;
-    parameter tot_times   = 2'd112;
+    //FSM fsm_state
+    localparam IDLE        = 2'b000;
+    localparam load_A      = 2'b100;
+    localparam load_data   = 2'b001;
+    localparam calculate   = 2'b010;
+    localparam next_col    = 2'b111;
+    localparam next_row    = 2'b101;
+    localparam tot_times   = 2'd28;
     
-    //state
-    reg [2:0] state;
-    reg [2:0] state_next;
-    assign fsm_state = state;
+    //fsm_state
+    reg [2:0] fsm_state;
+    reg [2:0] fsm_state_next;
 
-    //counter
+    //row counter
     reg [7:0] count;
     reg [7:0] count_next;
 
-    reg  [1:0] shift_count;
-    //wire [1:0] shift_count_next;
-    assign col_counter = count[1:0];
-    assign count_next  = load_done ? (count + 1'b1) : count;
-    assign row_finish  = (col_counter == 2'b11) ? 1'b0 : 1'b1;
+    //calculate counter
+    reg  [4:0] shift_count;
+    wire [4:0] shift_count_next;
+    assign shift_counter = shift_count;
+
+    //update shift counter
+    assign shift_count_next = (fsm_state == calculate) ? shift_count + 1'b1 : 5'b0;
+
+    //flag of column calculation finished
+    assign row_finish  = (shift_count == 5'd27);
+
+    assign col_count = shift_count;
+    assign row_count = count[1:0];
+    //finish acc flag
     assign acc_finish  = (count == tot_times ) ? 1'b0 : 1'b1;
-    //assign shift_count_next = (fsm_state == shift_data) ? (shift_count + 1'b1) : shift_count;
 
     //enable signals
-    //assign shift_data_en = (fsm_state == shift_data) ? 1'b1 : 1'b0;
-
-    assign ALU_en  = (fsm_state == calculate) ? 1'b1 : 1'b0;
-    assign load_en = (fsm_state == load_data) ? 1'b1 : 1'b0;
-    assign pready  = (fsm_state == load_data||fsm_state == IDLE) ? 1'b1 : 1'b0;
+    assign ALU_en    = (fsm_state == calculate)||(fsm_state == next_row ) ? 1'b1 : 1'b0;
+    assign load_en   = (fsm_state == load_data)||(fsm_state == calculate) ? 1'b1 : 1'b0;
+    assign load_A_en = (fsm_state == load_A) ? 1'b1 : 1'b0;
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
-        //reset state and counter
-        count     <= 5'b0;
-        state     <= IDLE;
+        //reset fsm_state and counter
+        count         <= 5'b0;
+        shift_count   <= 5'b0;
+        fsm_state     <= IDLE;
     end
     else begin
-        //update state and counter
-        state   <= state_next;
-        count   <= count_next;
+        //update fsm_state and counter
+        count       <= count_next;
+        shift_count <= shift_count_next;
+        fsm_state   <= fsm_state_next;
     end
 end
 
 //FSM for calculate
 always @(*) begin
-    state_next = state;
-    //update state
-    case (state) 
-        IDLE        : begin state_next = start_in   ? load_data : IDLE; end //if start_in = 1 start load_data
-        load_data   : begin state_next = load_done  ? calculate : load_data; end  //load data to ALU
-        calculate   : begin state_next = cal_finish ? next_col  : calculate; end  //if calculation finished start load next row
-        //shift_data  : begin state_next = load_done  ? next_col  : calculate; end  //if data loaded shift data to ALU
-        next_col    : begin state_next = row_finish ? load_data : next_row ; end  //finished calculation or load next column 
-        next_row    : begin state_next = acc_finish ? load_data : IDLE; end  //if data loaded shift data to ALU
-        default     : state_next = IDLE;
+    fsm_state_next = fsm_state;
+    //update fsm_state
+    case (fsm_state) 
+        IDLE        : begin fsm_state_next = start_in    ? load_A    : IDLE; end //if start_in = 1 start load_data
+        load_A      : begin fsm_state_next = load_A_done ? load_data : load_A; end  //load A to ALU
+        load_data   : begin fsm_state_next = load_done   ? calculate : load_data; end  //load data to ALU
+        calculate   : begin fsm_state_next = row_finish  ? next_col  : calculate; end  //if calculation finished start load next column
+        next_row    : begin fsm_state_next = acc_finish  ? calculate : IDLE ; end  //if data loaded shift data to ALU
+        default     : fsm_state_next = IDLE;
     endcase 
 end
 
 //counter logic
 always @(*) begin
     count_next = count;
+    //update row counter
     if(acc_finish)
         count_next = 5'b0;
     else begin
