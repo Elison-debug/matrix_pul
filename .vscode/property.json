@@ -1,0 +1,10 @@
+{
+	"toolChain": "xilinx",
+	"prjName": {
+		"PL": "matrix_pul"
+	},
+	"soc": {
+		"core": "none"
+	},
+	"device": "xc7vx485tffg1157-1"
+}

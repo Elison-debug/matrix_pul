@@ -1,0 +1,28 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/ALU.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ALU
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/A_buffer.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module A_buffer
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/SPHDL100909.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ST_SPHDL_2048x8m8_L_main
+INFO: [VRFC 10-311] analyzing module ST_SPHDL_2048x8m8_L_OPschlr
+INFO: [VRFC 10-311] analyzing module ST_SPHDL_2048x8m8_L
+INFO: [VRFC 10-311] analyzing module ST_SPHDL_1024x8m8_L_main
+INFO: [VRFC 10-311] analyzing module ST_SPHDL_1024x8m8_L_OPschlr
+INFO: [VRFC 10-311] analyzing module ST_SPHDL_1024x8m8_L
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/X_buffer.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module X_buffer
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/acc_ram.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module acc_ram
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/top/acc_top.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module acc_top
+WARNING: [VRFC 10-8497] literal value 'h0x2004 truncated to fit in 13 bits [e:/course/master/ICP/matrix_pul/user/src/top/acc_top.v:28]
+WARNING: [VRFC 10-8497] literal value 'h0x2004 truncated to fit in 13 bits [e:/course/master/ICP/matrix_pul/user/src/top/acc_top.v:29]
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/clock_gate.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module clock_gate
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/controller.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module controller
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/wb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module wb
+INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/sim/top_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module top_tb
+WARNING: [VRFC 10-8497] literal value 'h0x2004 truncated to fit in 13 bits [e:/course/master/ICP/matrix_pul/user/sim/top_tb.v:61]

@@ -1,0 +1,18 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../../../user/src/ALU.v" \
+"../../../../../../user/src/A_buffer.v" \
+"../../../../../../user/src/SPHDL100909.v" \
+"../../../../../../user/src/X_buffer.v" \
+"../../../../../../user/src/acc_ram.v" \
+"../../../../../../user/src/top/acc_top.v" \
+"../../../../../../user/src/clock_gate.v" \
+"../../../../../../user/src/controller.v" \
+"../../../../../../user/src/wb.v" \
+"../../../../../../user/sim/top_tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
