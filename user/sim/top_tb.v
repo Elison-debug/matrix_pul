@@ -1,6 +1,6 @@
 `define ACC_EN_VALUE               32'd1    // enable clock gating
 `define ACC_END_VALUE              32'd0    // disable clock gating
-`define ACC_EN_ADDR                13'h0x1fff
+`define ACC_EN_ADDR                13'b1111111111111
 `define ACC_LOAD_A_ADDR            13'd1    // load A to ALU
 `define ACC_LOAD_X_ADDR            13'd2    // load X to ALU
 `timescale 1ns / 1ns
@@ -14,14 +14,14 @@ module top_tb();
     //localparam X_NUM_KEYS = $clog2(matrix_num*28*28);   //total data num
     //localparam A_NUM_KEYS = $clog2(matrix_num*3*3);   //total data num
 
-    localparam A_INPUT = "filter_matrix_all_bin.txt";
-    localparam X_INPUT = "input_matrix_all_bin.txt";
-    localparam RESULT_FILE = "conv_output_all_bin.txt";
+    localparam A_INPUT = "filter_bin.txt";
+    localparam X_INPUT = "input_bin.txt";
+    localparam RESULT_FILE = "conv_bin.txt";
 
     reg [7:0] A_memory [0:matrix_num*A_NUM-1];
     reg [7:0] X_memory [0:matrix_num*X_NUM-1]; // 8 bit memory with 32 * matrix_num entries
     reg [19:0] result_data     [0:matrix_num*28*28-1]; // 18 bit result with 16 * matrix_num entries
-    reg [19:0] result_data_ALU [0:matrix_num*28*28-1]; // 18 bit result with 16 * matrix_num entries
+    //reg [19:0] result_data_ALU [0:matrix_num*28*28-1]; // 18 bit result with 16 * matrix_num entries
 
     // APB signals
     reg  [12:0] PADDR;
@@ -63,23 +63,27 @@ initial begin
     write_A(0); // Load A matrix
     write_X(0); // Load X matrix
 
-    #100;
-    for (i = 0; i < 28*28-1; i = i + 1) begin
+    #1000;
+    for (i = 1; i < 28*28+1; i = i + 1) begin
       apb_read (4*i);
       //$display("Time %0t: Address = %d, data_out_ALU = %b", $time, i, result_data_ALU[i]);
     end
 
+    #1000;
+    apb_write(`ACC_EN_ADDR, `ACC_END_VALUE);
     #100;
 
+    apb_write(`ACC_EN_ADDR, `ACC_EN_VALUE);
     write_A(A_NUM); // Load A matrix 2
     write_X(X_NUM); // Load X matrix 2
 
-    #3000;
-    for (i = 0; i < 28*28-1; i = i + 1) begin
+    #1000;
+    for (i = 1; i < 28*28+1; i = i + 1) begin
       apb_read (4*i);
       //$display("Time %0t: Address = %d, data_out_ALU = %b", $time, i, result_data_ALU[i]);
     end
-
+    #1000;
+    apb_write(`ACC_EN_ADDR, `ACC_END_VALUE);
       #50;
       $display("Time %0t: Congratulations!! results are all correct!!", $time);
       $finish;
@@ -88,7 +92,7 @@ end
   task write_A(input integer index);
     begin
         for (j = index; j < A_NUM+index; j = j + 4) begin
-          if (j != 8) begin
+          if ((j != 8) && (j != 17)) begin
             apb_write(`ACC_LOAD_A_ADDR, {A_memory[j], A_memory[j+1], A_memory[j+2], A_memory[j+3]});
             @(posedge clk);
           end
@@ -115,6 +119,11 @@ end
   task apb_write(input [12:0] addr, input [31:0] data);
     begin
       @(posedge clk);
+      @(posedge clk);
+      @(posedge clk);
+      @(posedge clk);
+      @(posedge clk);
+      @(posedge clk);
       PADDR   = addr;
       PWDATA  = data;
       PWRITE  = 1;
@@ -130,13 +139,16 @@ end
       PSEL    = 0;
       PENABLE = 0;
       PWRITE  = 0;
-      //$display("APB WRITE successful: Addr=0x%08X, Data=0x%08X", addr, data);
+      $display("APB WRITE successful: Addr=0x%08X, Data=0x%08X", addr, data);
     end
   endtask
 
   // APB Read Task
   task apb_read(input [12:0] addr);
     begin
+      @(posedge clk);
+      @(posedge clk);
+      @(posedge clk);
       @(posedge clk);
       PADDR   = addr;
       PWRITE  = 0;
@@ -149,8 +161,8 @@ end
       wait (PREADY == 1);
       @(posedge clk);
 
-      if(PRDATA != result_data[addr[12:2]])begin
-        $display("Error: result_data[%d] = %b, result_data_ALU[%d] = %b", i, result_data[i], i, result_data_ALU[i]);
+      if(PRDATA[19:0] != result_data[i-2])begin
+        $display("Error: result_data[%d] = %d, PRDATA[%d] = %d", i, result_data[i-2], i, PRDATA[19:0]);
       end
       //$display("APB READ : Addr=0x%08X, Data=0x%08X", addr, PRDATA);
 

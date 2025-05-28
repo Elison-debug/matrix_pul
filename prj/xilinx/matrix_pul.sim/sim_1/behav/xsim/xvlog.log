@@ -15,8 +15,7 @@ INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/use
 INFO: [VRFC 10-311] analyzing module acc_ram
 INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/top/acc_top.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module acc_top
-WARNING: [VRFC 10-8497] literal value 'h0x2004 truncated to fit in 13 bits [e:/course/master/ICP/matrix_pul/user/src/top/acc_top.v:28]
-WARNING: [VRFC 10-8497] literal value 'h0x2004 truncated to fit in 13 bits [e:/course/master/ICP/matrix_pul/user/src/top/acc_top.v:29]
+WARNING: [VRFC 10-2938] 'ry_o' is already implicitly declared on line 67 [e:/course/master/ICP/matrix_pul/user/src/top/acc_top.v:138]
 INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/clock_gate.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module clock_gate
 INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/src/controller.v" into library xil_defaultlib
@@ -25,4 +24,3 @@ INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/use
 INFO: [VRFC 10-311] analyzing module wb
 INFO: [VRFC 10-2263] Analyzing Verilog file "e:/course/master/ICP/matrix_pul/user/sim/top_tb.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module top_tb
-WARNING: [VRFC 10-8497] literal value 'h0x2004 truncated to fit in 13 bits [e:/course/master/ICP/matrix_pul/user/sim/top_tb.v:61]

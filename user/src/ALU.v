@@ -9,12 +9,15 @@ module ALU(
     input [23:0] X_reg3,
 
     output [19:0] sum,     // output result for each mul-sum product seperately
-    output web 
+    output reg web 
 );  
-
+    //reg  web_r;
+    //wire web_r_next;
+    wire web_next; // web signal for write enable
     //finish and web signal
-    assign web  = ALU_en; // web is high when ALU_en is high
-    
+    //assign web_r_next  = ALU_en; // web is high when ALU_en is high
+    //assign web_next = web_r; // web_next is the next state of web
+    assign web_next = ALU_en; // web is high when ALU_en is high
     // MU Reg
     reg [16:0]  MU1_r;
     reg [16:0]  MU2_r;
@@ -44,10 +47,15 @@ module ALU(
 
     always @(posedge clk or negedge rst) begin
         if(!rst) begin
+            web   <= 0; 
+            //web_r <= 0;
             MU1_r <= 0; MU2_r <= 0; MU3_r <= 0; MU4_r <= 0;
             MU5_r <= 0; MU6_r <= 0; MU7_r <= 0;
+            MU8_r <= 0; MU9_r <= 0;
         end
         else begin
+            //web_r <= web_r_next;
+            web   <= web_next;
             MU1_r <= MU1_next; 
             MU2_r <= MU2_next; 
             MU3_r <= MU3_next; 

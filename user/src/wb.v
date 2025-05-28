@@ -18,7 +18,7 @@ module wb(
     //ram address
     reg [12:0] ram_addr;
     reg [12:0] ram_addr_next;
-    assign w_addr = ram_addr;
+    assign w_addr = ram_addr_next;
 
     //dataRAM and ram enable signal
     assign dataRAM[31:20] = 12'b0;
@@ -35,7 +35,7 @@ end
 
 always @(*) begin
     ram_addr_next  = ram_addr;
-    ram_addr_next  = web ? ram_addr : ram_addr + 12'd4 ; //if ram en then count else wait
+    ram_addr_next  = web ? ram_addr + 12'd4 : ram_addr ; //if ram en then count else wait
 end
 
 endmodule

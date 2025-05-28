@@ -20,7 +20,7 @@ module A_buffer(
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
         count   <= 2'b0;
-        rom_out <= 8'b0;
+        rom_out <= 72'b0;
     end
     else begin
         count   <= count_next;

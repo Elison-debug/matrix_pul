@@ -2,7 +2,7 @@
 `define ACC_EN_VALUE               32'd1    // enable clock gating
 `define ACC_END_VALUE              32'd0    // disable clock gating
 
-`define ACC_EN_ADDR                13'h0x1fff
+`define ACC_EN_ADDR                13'b1111111111111
 `define ACC_LOAD_A_ADDR            13'd1    // load A to ALU
 `define ACC_LOAD_X_ADDR            13'd2    // load X to ALU
 `timescale 1ns / 1ns
@@ -52,22 +52,23 @@ wire [31:0] prdata;
 assign PRDATA   = read_n ? prdata : 32'b0;
 //assign PSELVERR = PSEL ? pslverr : 1'b0;
 assign PSLVERR  = 1'b0;
-//assign PREADY   = PSEL && PENABLE ? 1'b1 : pready;
-assign PREADY   = 1'b1;
+assign PREADY   = pready;
+//assign PREADY   = 1'b1;
 
 // outports wire
 wire       	ALU_en;
 wire       	load_en;
 wire       	row_finish;
-wire [1:0] 	row_count;
+wire [4:0] 	row_count;
 
 controller u_controller(
 	.clk        	( clk         ),
 	.rst        	( rst         ),
+	.ry_o           ( ry_o        ),
 	.start_in   	( start_in    ),
 	.load_done  	( load_done   ),
 	.load_A_done	( load_A_done ),
-	//.pready	 	    ( pready      ),
+	.pready	 	    ( pready      ),
 	.ALU_en     	( ALU_en      ),
 	.load_en    	( load_en     ),
 	.load_A_en 	    ( load_A_en   ),
@@ -115,6 +116,7 @@ X_buffer u_X_buffer(
 	.valid_input 	( write_X_n    ),
 	.X_load      	( PWDATA       ),
 	.row_count  	( row_count    ),
+	.row_finish 	( row_finish   ),
 	.X_reg1      	( X_reg1       ),
 	.X_reg2      	( X_reg2       ),
 	.X_reg3      	( X_reg3       ),
@@ -133,15 +135,16 @@ wb u_wb(
 	.w_addr  	( w_addr   ),
 	.dataRAM 	( dataRAM  )
 );
-
+wire ry_o; 
 acc_ram u_acc_ram(
 	.clk     	( HCLK          ),
 	.en_i    	( web||read_n   ),
+	.we_i    	( ~web          ),
 	.w_addr_i  	( w_addr        ),
 	.r_addr_i  	( PADDR         ),
 	.wdata_i 	( dataRAM       ),
 	.rdata_o 	( prdata        ),
-	.we_i    	( web           )
+	.ry_o    	( ry_o          )
 );
 
 

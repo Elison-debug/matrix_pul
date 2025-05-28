@@ -147,3 +147,41 @@ selectMenuItem(PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL, "Run 
 // Run Command: PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL
 // TclEventType: LAUNCH_SIM
 dismissDialog("Run Simulation"); // e (Run Simulation Progress)
+// Elapsed time: 22 seconds
+selectTree(PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, "[, Simulation, Run Simulation]", 10, false); // g (PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, Flow Navigator Tree)
+selectMenuItem(PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL, "Run Behavioral Simulation"); // ap (PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL, simulation_run_behavioral_menu)
+// Run Command: PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL
+// TclEventType: LAUNCH_SIM
+dismissDialog("Run Simulation"); // e (Run Simulation Progress)
+selectTab((HResource) null, (HResource) null, "Messages", 1); // aa
+selectTab((HResource) null, (HResource) null, "Log", 2); // aa
+selectTab((HResource) null, (HResource) null, "Tcl Console", 0); // aa
+selectCodeEditor(RDIResource.TclConsoleView_TCL_CONSOLE_CODE_EDITOR, 958, 141); // cC (RDIResource.TclConsoleView_TCL_CONSOLE_CODE_EDITOR)
+selectTab((HResource) null, (HResource) null, "Reports", 3); // aa
+selectTab((HResource) null, (HResource) null, "Design Runs", 4); // aa
+selectTab((HResource) null, (HResource) null, "Log", 2); // aa
+selectTab((HResource) null, (HResource) null, "Messages", 1); // aa
+selectTab((HResource) null, (HResource) null, "Tcl Console", 0); // aa
+selectCodeEditor(RDIResource.TclConsoleView_TCL_CONSOLE_CODE_EDITOR, 362, 132); // cC (RDIResource.TclConsoleView_TCL_CONSOLE_CODE_EDITOR)
+selectTree(PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, "[, RTL Analysis, Run Linter]", 12, false); // g (PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, Flow Navigator Tree)
+// TclEventType: MSGMGR_REFRESH_MSG
+// HMemoryUtils.trashcanNow. Engine heap size: 1,576 MB. GUI used memory: 98 MB. Current time: 5/27/25, 10:58:48 PM CEST
+// HMemoryUtils.trashcanNow. Engine heap size: 1,584 MB. GUI used memory: 98 MB. Current time: 5/27/25, 10:59:13 PM CEST
+// Elapsed time: 58 seconds
+selectButton(RDIResource.ProgressDialog_BACKGROUND, "Background", "Run Linter"); // a (RDIResource.ProgressDialog_BACKGROUND)
+// 'a' command handler elapsed time: 58 seconds
+// [Engine Memory]: 1,584 MB (+616831kb) [00:02:09]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,591 MB. GUI used memory: 98 MB. Current time: 5/27/25, 10:59:43 PM CEST
+// HMemoryUtils.trashcanNow. Engine heap size: 1,591 MB. GUI used memory: 99 MB. Current time: 5/27/25, 10:59:43 PM CEST
+selectTab((HResource) null, (HResource) null, "Messages", 1); // aa
+selectTab((HResource) null, (HResource) null, "Log", 2); // aa
+selectTab((HResource) null, (HResource) null, "Reports", 3); // aa
+selectTab((HResource) null, (HResource) null, "Design Runs", 4); // aa
+selectTab((HResource) null, (HResource) null, "Reports", 3); // aa
+selectTab((HResource) null, (HResource) null, "Tcl Console", 0); // aa
+selectCodeEditor(RDIResource.TclConsoleView_TCL_CONSOLE_CODE_EDITOR, 1034, 96); // cC (RDIResource.TclConsoleView_TCL_CONSOLE_CODE_EDITOR)
+selectTree(PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, "[, Simulation]", 9, true); // g (PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, Flow Navigator Tree) - Node
+selectTree(PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, "[, Simulation]", 9, true); // g (PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, Flow Navigator Tree) - Node
+selectCodeEditor(RDIResource.TclConsoleView_TCL_CONSOLE_CODE_EDITOR, 679, 260); // cC (RDIResource.TclConsoleView_TCL_CONSOLE_CODE_EDITOR)
+selectButton("HStatusBar_ProgressStatusItem_Cancel", "Cancel"); // NullButton (HStatusBar_ProgressStatusItem_Cancel)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,630 MB. GUI used memory: 98 MB. Current time: 5/27/25, 11:00:13 PM CEST

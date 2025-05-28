@@ -7,8 +7,9 @@ module X_buffer#(
     input  ALU_en, //En shift buffer
     input  load_en,
     input  valid_input,
+    input  row_finish,
     input  [31:0] X_load,    //input data
-    input  [1 :0] row_count,
+    input  [4 :0] row_count,
     output [23:0] X_reg1,  
     output [23:0] X_reg2,
     output [23:0] X_reg3,
@@ -22,9 +23,9 @@ module X_buffer#(
     reg [239:0] s_reg [3:0];
     reg [239:0] s_reg_next [3:0];
 
-    assign X_reg1 = s_reg[row_count+2'b01][239:216];
-    assign X_reg2 = s_reg[row_count+2'b10][239:216];
-    assign X_reg3 = s_reg[row_count+2'b11][239:216];
+    assign X_reg1 = s_reg[row_count[1:0]+2'b01][239:216];
+    assign X_reg2 = s_reg[row_count[1:0]+2'b10][239:216];
+    assign X_reg3 = s_reg[row_count[1:0]+2'b11][239:216];
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
@@ -52,32 +53,25 @@ always @(*) begin
     s_reg_next[2]    = s_reg[2];
     s_reg_next[3]    = s_reg[3];
     if(load_done) begin
-        count_next = 2'b0;
+        count_next = 3'b0;
+    end
+    else if(row_count==5'd28 && row_finish) begin
+        s_reg_next[row_count[1:0]] = 240'b0;
+        count_next = count + 3'd7;  
     end
     else if(load_en && valid_input)begin
-        case(row_count)
-            2'b00 : begin 
-                    s_reg_next[0] = {8'b0, s_reg[0][199:8], X_load, 8'b0}; 
-                 end 
-            2'b01 : begin 
-                    s_reg_next[1] = {8'b0, s_reg[1][199:8], X_load, 8'b0}; 
-                 end
-            2'b10 : begin 
-                    s_reg_next[2] = {8'b0, s_reg[2][199:8], X_load, 8'b0}; 
-                 end
-            2'b11 : begin 
-                    s_reg_next[3] = {8'b0, s_reg[3][199:8], X_load, 8'b0}; 
-                 end
-            default : begin
-                    count_next = count;  
-            end
-        endcase
+        s_reg_next[row_count[1:0]] = {8'b0, s_reg[row_count[1:0]][199:8], X_load, 8'b0};
         count_next = count +1'b1;  
     end 
+    if(row_finish)begin
+        s_reg_next[row_count[1:0]+2'b01] = {s_reg[row_count[1:0]+2'b01][215:0] , s_reg[row_count[1:0]+2'b01][239:216]};
+        s_reg_next[row_count[1:0]+2'b10] = {s_reg[row_count[1:0]+2'b10][215:0] , s_reg[row_count[1:0]+2'b10][239:216]};
+        s_reg_next[row_count[1:0]+2'b11] = {s_reg[row_count[1:0]+2'b11][215:0] , s_reg[row_count[1:0]+2'b11][239:216]};
+    end
     else if(ALU_en) begin
-        s_reg_next[row_count+2'b01] = {s_reg[row_count+2'b01][215:0] , s_reg[row_count+2'b01][239:216]};
-        s_reg_next[row_count+2'b10] = {s_reg[row_count+2'b10][215:0] , s_reg[row_count+2'b10][239:216]};
-        s_reg_next[row_count+2'b11] = {s_reg[row_count+2'b11][215:0] , s_reg[row_count+2'b11][239:216]};
+        s_reg_next[row_count[1:0]+2'b01] = {s_reg[row_count[1:0]+2'b01][231:0] , s_reg[row_count[1:0]+2'b01][239:232]};
+        s_reg_next[row_count[1:0]+2'b10] = {s_reg[row_count[1:0]+2'b10][231:0] , s_reg[row_count[1:0]+2'b10][239:232]};
+        s_reg_next[row_count[1:0]+2'b11] = {s_reg[row_count[1:0]+2'b11][231:0] , s_reg[row_count[1:0]+2'b11][239:232]};
     end
     
 end
