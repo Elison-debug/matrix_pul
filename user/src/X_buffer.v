@@ -29,10 +29,10 @@ module X_buffer#(
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
-        s_reg[0]   <= 72'b0;
-        s_reg[1]   <= 72'b0;
-        s_reg[2]   <= 72'b0;
-        s_reg[3]   <= 72'b0;
+        s_reg[0]   <= 240'b0;
+        s_reg[1]   <= 240'b0;
+        s_reg[2]   <= 240'b0;
+        s_reg[3]   <= 240'b0;
         count       <= 3'b0;
     end
     else begin

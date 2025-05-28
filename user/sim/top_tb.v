@@ -64,8 +64,14 @@ initial begin
     write_X(0); // Load X matrix
 
     #1000;
-    for (i = 1; i < 28*28+1; i = i + 1) begin
+    for (i = 1; i < X_NUM+2; i = i + 1) begin
       apb_read (4*i);
+      if(PRDATA[19:0] != result_data[i-2])begin
+        $display("Error: result_data[%d] = %d, PRDATA[%d] = %d", i, result_data[i-2], i-1, PRDATA[19:0]);
+      end
+      else begin 
+        $display("Time %0t: Address = %d, data_out_ALU = %b", $time, i, PRDATA[19:0]);
+      end
       //$display("Time %0t: Address = %d, data_out_ALU = %b", $time, i, result_data_ALU[i]);
     end
 
@@ -78,8 +84,14 @@ initial begin
     write_X(X_NUM); // Load X matrix 2
 
     #1000;
-    for (i = 1; i < 28*28+1; i = i + 1) begin
+    for (i = 1; i < X_NUM+2; i = i + 1) begin
       apb_read (4*i);
+      if(PRDATA[19:0] != result_data[X_NUM+i-2])begin
+        $display("Error: result_data[%d] = %d, PRDATA[%d] = %d", i, result_data[i-2], i-1, PRDATA[19:0]);
+      end
+      else begin 
+        $display("Time %0t: Address = %d, data_out_ALU = %b", $time, i-1, PRDATA[19:0]);
+      end
       //$display("Time %0t: Address = %d, data_out_ALU = %b", $time, i, result_data_ALU[i]);
     end
     #1000;
@@ -160,10 +172,6 @@ end
 
       wait (PREADY == 1);
       @(posedge clk);
-
-      if(PRDATA[19:0] != result_data[i-2])begin
-        $display("Error: result_data[%d] = %d, PRDATA[%d] = %d", i, result_data[i-2], i, PRDATA[19:0]);
-      end
       //$display("APB READ : Addr=0x%08X, Data=0x%08X", addr, PRDATA);
 
       PSEL    = 0;

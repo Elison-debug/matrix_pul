@@ -60,6 +60,7 @@ wire       	ALU_en;
 wire       	load_en;
 wire       	row_finish;
 wire [4:0] 	row_count;
+wire ry_o; 
 
 controller u_controller(
 	.clk        	( clk         ),
@@ -76,7 +77,6 @@ controller u_controller(
 	.row_count  	( row_count   )
 	
 );
-
 
 // outports wire
 wire [19:0] 	sum;
@@ -135,7 +135,7 @@ wb u_wb(
 	.w_addr  	( w_addr   ),
 	.dataRAM 	( dataRAM  )
 );
-wire ry_o; 
+//wire ry_o; 
 acc_ram u_acc_ram(
 	.clk     	( HCLK          ),
 	.en_i    	( web||read_n   ),
