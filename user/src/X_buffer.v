@@ -1,7 +1,5 @@
 `timescale 1ns / 1ns
-module X_buffer#(
-    parameter APB_ADDR_WIDTH = 13  //APB slaves are 4KB by default
-)(
+module X_buffer(
     input  clk,
     input  rst,
     input  ALU_en, //En shift buffer
@@ -23,9 +21,9 @@ module X_buffer#(
     reg [239:0] s_reg [3:0];
     reg [239:0] s_reg_next [3:0];
 
-    assign X_reg1 = s_reg[row_count[1:0]+2'b01][239:216];
-    assign X_reg2 = s_reg[row_count[1:0]+2'b10][239:216];
-    assign X_reg3 = s_reg[row_count[1:0]+2'b11][239:216];
+    assign X_reg1 = s_reg[row_count[1:0]+2'b01][23:0];
+    assign X_reg2 = s_reg[row_count[1:0]+2'b10][23:0];
+    assign X_reg3 = s_reg[row_count[1:0]+2'b11][23:0];
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
@@ -60,18 +58,18 @@ always @(*) begin
         count_next = count + 3'd7;  
     end
     else if(load_en && valid_input)begin
-        s_reg_next[row_count[1:0]] = {8'b0, s_reg[row_count[1:0]][199:8], X_load, 8'b0};
+        s_reg_next[row_count[1:0]] = {8'b0, X_load, s_reg[row_count[1:0]][231:40], 8'b0};
         count_next = count +1'b1;  
     end 
     if(row_finish)begin
-        s_reg_next[row_count[1:0]+2'b01] = {s_reg[row_count[1:0]+2'b01][215:0] , s_reg[row_count[1:0]+2'b01][239:216]};
-        s_reg_next[row_count[1:0]+2'b10] = {s_reg[row_count[1:0]+2'b10][215:0] , s_reg[row_count[1:0]+2'b10][239:216]};
-        s_reg_next[row_count[1:0]+2'b11] = {s_reg[row_count[1:0]+2'b11][215:0] , s_reg[row_count[1:0]+2'b11][239:216]};
+        s_reg_next[row_count[1:0]+2'b01] = {s_reg[row_count[1:0]+2'b01][15:0] , s_reg[row_count[1:0]+2'b01][239:16]};
+        s_reg_next[row_count[1:0]+2'b10] = {s_reg[row_count[1:0]+2'b10][15:0] , s_reg[row_count[1:0]+2'b10][239:16]};
+        s_reg_next[row_count[1:0]+2'b11] = {s_reg[row_count[1:0]+2'b11][15:0] , s_reg[row_count[1:0]+2'b11][239:16]};
     end
     else if(ALU_en) begin
-        s_reg_next[row_count[1:0]+2'b01] = {s_reg[row_count[1:0]+2'b01][231:0] , s_reg[row_count[1:0]+2'b01][239:232]};
-        s_reg_next[row_count[1:0]+2'b10] = {s_reg[row_count[1:0]+2'b10][231:0] , s_reg[row_count[1:0]+2'b10][239:232]};
-        s_reg_next[row_count[1:0]+2'b11] = {s_reg[row_count[1:0]+2'b11][231:0] , s_reg[row_count[1:0]+2'b11][239:232]};
+        s_reg_next[row_count[1:0]+2'b01] = {s_reg[row_count[1:0]+2'b01][7:0] , s_reg[row_count[1:0]+2'b01][239:8]};
+        s_reg_next[row_count[1:0]+2'b10] = {s_reg[row_count[1:0]+2'b10][7:0] , s_reg[row_count[1:0]+2'b10][239:8]};
+        s_reg_next[row_count[1:0]+2'b11] = {s_reg[row_count[1:0]+2'b11][7:0] , s_reg[row_count[1:0]+2'b11][239:8]};
     end
     
 end

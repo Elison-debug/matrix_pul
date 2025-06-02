@@ -2,11 +2,11 @@
 `define ACC_EN_VALUE               32'd1    // enable clock gating
 `define ACC_END_VALUE              32'd0    // disable clock gating
 
-`define ACC_EN_ADDR                13'b1111111111111
-`define ACC_LOAD_A_ADDR            13'd1    // load A to ALU
-`define ACC_LOAD_X_ADDR            13'd2    // load X to ALU
+`define ACC_EN_ADDR                13'h1FF0
+`define ACC_LOAD_A_ADDR            13'h1FF4    // load A to ALU
+`define ACC_LOAD_X_ADDR            13'h1FF8    // load X to ALU
 `timescale 1ns / 1ns
-module acc_top
+module apb_acc
 #(
     parameter APB_ADDR_WIDTH = 13  //APB slaves are 8KB by default
 )(
@@ -23,8 +23,9 @@ module acc_top
 );
 
 // Clock gating
-wire clk_en, clk_end ,start_in, write_A_n, write_X_n;
+wire clk_en, clk_end,start_in, write_A_n, write_X_n;
 assign acc_write = PSEL && PENABLE && PWRITE;
+
 assign clk_en    = acc_write && (PWDATA == `ACC_EN_VALUE )&& (PADDR == `ACC_EN_ADDR); // enable clock gating
 assign clk_end   = acc_write && (PWDATA == `ACC_END_VALUE)&& (PADDR == `ACC_EN_ADDR); // disable clock gating
 assign write_A_n = acc_write && (PADDR == `ACC_LOAD_A_ADDR) ? 1'b1 : 1'b0;
@@ -41,18 +42,20 @@ clock_gate clk_gate_inst (
     .clk_en  ( clk_en        ),
     .clk_end ( clk_end       ),
     .start_in( start_in      ),
-	.rst_o   ( rst           ),
+    .rst_o   ( rst           ),
     .clk_o   ( clk           )
 );
 
 // output mux
 //reg pslverr;
-//wire pready;
+wire ry_o; 
+wire pready;
 wire [31:0] prdata;
-assign PRDATA   = read_n ? prdata : 32'b0;
+assign PRDATA   = prdata;
+//assign PRDATA   = read_n ? prdata : 32'b0;
 //assign PSELVERR = PSEL ? pslverr : 1'b0;
 assign PSLVERR  = 1'b0;
-assign PREADY   = pready;
+assign PREADY   = read_n ?  ry_o : pready;
 //assign PREADY   = 1'b1;
 
 // outports wire
@@ -60,19 +63,17 @@ wire       	ALU_en;
 wire       	load_en;
 wire       	row_finish;
 wire [4:0] 	row_count;
-wire ry_o; 
 
 controller u_controller(
 	.clk        	( clk         ),
 	.rst        	( rst         ),
-	.ry_o           ( ry_o        ),
 	.start_in   	( start_in    ),
 	.load_done  	( load_done   ),
 	.load_A_done	( load_A_done ),
-	.pready	 	    ( pready      ),
+	.pready	 	( pready      ),
 	.ALU_en     	( ALU_en      ),
 	.load_en    	( load_en     ),
-	.load_A_en 	    ( load_A_en   ),
+	.load_A_en 	( load_A_en   ),
 	.row_finish 	( row_finish  ),
 	.row_count  	( row_count   )
 	
@@ -103,7 +104,7 @@ A_buffer u_A_buffer(
 	.rst        	( rst         ),
 	.PWDATA     	( PWDATA      ),
 	.valid_input 	( write_A_n   ),
-	.load_A_en 	    ( load_A_en   ),
+	.load_A_en 	( load_A_en   ),
 	.load_A_done    ( load_A_done ),
 	.A_input    	( A_input     )
 );
@@ -125,7 +126,7 @@ X_buffer u_X_buffer(
 
 // outports wire
 wire [31:0] dataRAM;
-wire [APB_ADDR_WIDTH-1:0] 	w_addr;
+wire [11:0] 	w_addr;
 
 wb u_wb(
 	.clk     	( clk      ),
@@ -135,18 +136,17 @@ wb u_wb(
 	.w_addr  	( w_addr   ),
 	.dataRAM 	( dataRAM  )
 );
-//wire ry_o; 
+
 acc_ram u_acc_ram(
-	.clk     	( HCLK          ),
+        .clk     	( clk           ),
+        .rst        	( rst           ),
 	.en_i    	( web||read_n   ),
 	.we_i    	( ~web          ),
 	.w_addr_i  	( w_addr        ),
-	.r_addr_i  	( PADDR         ),
+	.r_addr_i  	( PADDR[11:0]   ),
 	.wdata_i 	( dataRAM       ),
 	.rdata_o 	( prdata        ),
-	.ry_o    	( ry_o          )
+        .ry_o           ( ry_o          )
 );
-
-
 endmodule
 

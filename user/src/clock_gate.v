@@ -1,9 +1,6 @@
 // Description: Clock gating module
 `timescale 1ns / 1ns
 module clock_gate
-#(
-    parameter APB_ADDR_WIDTH = 12  //APB slaves are 4KB by default
-)
 (
     input                        clk_i    ,   // input clock
     input                        rst      ,   // reset signal

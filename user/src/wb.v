@@ -5,19 +5,16 @@ module wb(
     input  web,
     input  [19:0] sum,
 
-    output [12:0] w_addr,
+    output [11:0] w_addr,
     output [31:0] dataRAM
 );
     //state
     reg wb_next;
     reg wb_state;
 
-    localparam wb_IDLE  = 1'b0;
-    localparam wb_start = 1'b1;
-
     //ram address
-    reg [12:0] ram_addr;
-    reg [12:0] ram_addr_next;
+    reg [11:0] ram_addr;
+    reg [11:0] ram_addr_next;
     assign w_addr = ram_addr_next;
 
     //dataRAM and ram enable signal

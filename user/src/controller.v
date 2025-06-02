@@ -2,7 +2,6 @@
 module controller(
     input  clk,
     input  rst,
-    input  ry_o,
     input  start_in,
     input  load_A_done,
     input  load_done,
@@ -46,14 +45,14 @@ module controller(
 
     assign row_count = count;
     //finish acc flag
-    assign acc_finish  = (count == tot_times ) ? 1'b1 : 1'b0;
+    assign acc_finish  = (count == tot_times );
 
     //enable signals
-    //assign ALU_en    = (fsm_state == calculate)||(fsm_state == next_row ) ? 1'b1 : 1'b0;
-    assign ALU_en    = (fsm_state == calculate)||(fsm_state == last_row) ? 1'b1 : 1'b0;
-    assign load_en   = (fsm_state != IDLE) ? 1'b1 : 1'b0;
-    assign load_A_en = (fsm_state == load_A)   ? 1'b1 : 1'b0;
-    assign pready    = fsm_state == IDLE || load_en || load_A_en ||ry_o; //ready to accept new data
+    //assign ALU_en    = (fsm_state == calculate)||(fsm_state == next_row );
+    assign ALU_en    = (fsm_state == calculate)||(fsm_state == last_row);
+    assign load_en   = (fsm_state != IDLE  );
+    assign load_A_en = (fsm_state == load_A);
+    assign pready    = (fsm_state != last_row); //ready to accept new data
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
@@ -75,13 +74,13 @@ always @(*) begin
     fsm_state_next = fsm_state;
     //update fsm_state
     case (fsm_state) 
-        IDLE        : begin fsm_state_next = start_in    ? load_A    : IDLE; count_next = 5'b0;end //if start_in = 1 start load_data
-        load_A      : begin fsm_state_next = load_A_done ? load_data1: load_A; end  //load A to ALU
+        IDLE        : begin fsm_state_next = start_in    ? load_A    : IDLE;       end //if start_in = 1 start load_data
+        load_A      : begin fsm_state_next = load_A_done ? load_data1: load_A;     end  //load A to ALU
         load_data1  : begin fsm_state_next = load_done   ? load_data2: load_data1; end  //load data to ALU
         load_data2  : begin fsm_state_next = load_done   ? calculate : load_data2; end  //load data to ALU
         calculate   : begin fsm_state_next = row_finish  ? next_row  : calculate ; end  //if calculation finished start load next column
         next_row    : begin fsm_state_next = acc_finish  ? last_row  : load_data2; end  //if data loaded shift data to ALU
-        last_row    : begin fsm_state_next = row_finish  ? IDLE      : last_row   ;end  //if last row loaded then go to idle
+        last_row    : begin fsm_state_next = row_finish  ? IDLE      : last_row  ; end  //if last row loaded then go to idle
         default     : fsm_state_next = IDLE;
     endcase 
 end
@@ -90,8 +89,10 @@ end
 always @(*) begin
     count_next = count;
     //update row counter
-        
-    if(load_done)begin
+    if(fsm_state == IDLE  )begin
+        count_next = 5'b0;
+    end
+    else if(load_done)begin
         count_next  = count + 1'b1;
     end
 end

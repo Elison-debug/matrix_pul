@@ -48,7 +48,6 @@ module ALU(
     always @(posedge clk or negedge rst) begin
         if(!rst) begin
             web   <= 0; 
-            //web_r <= 0;
             MU1_r <= 0; MU2_r <= 0; MU3_r <= 0; MU4_r <= 0;
             MU5_r <= 0; MU6_r <= 0; MU7_r <= 0;
             MU8_r <= 0; MU9_r <= 0;
@@ -72,15 +71,15 @@ module ALU(
     always @(*) begin
         if (ALU_en) begin
             // If ALU_en is high, then we are in the multiply and accumulate state.
-            MU1_next = A_input[71:64]*X_reg1[23:16];
+            MU1_next = A_input[71:64]*X_reg1[7 : 0];
             MU2_next = A_input[63:56]*X_reg1[15: 8];
-            MU3_next = A_input[55:48]*X_reg1[7 : 0];
-            MU4_next = A_input[47:40]*X_reg2[23:16];
+            MU3_next = A_input[55:48]*X_reg1[23:16];
+            MU4_next = A_input[47:40]*X_reg2[7 : 0];
             MU5_next = A_input[39:32]*X_reg2[15: 8];
-            MU6_next = A_input[31:24]*X_reg2[7 : 0];
-            MU7_next = A_input[23:16]*X_reg3[23:16];
+            MU6_next = A_input[31:24]*X_reg2[23:16];
+            MU7_next = A_input[23:16]*X_reg3[7 : 0];
             MU8_next = A_input[15: 8]*X_reg3[15: 8];
-            MU9_next = A_input[7 : 0]*X_reg3[7 : 0];
+            MU9_next = A_input[7 : 0]*X_reg3[23:16];
         end
         else begin
             // Reset the MU registers.

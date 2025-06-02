@@ -1,0 +1,14 @@
+acc:
+  incdirs: [
+    rtl,
+  ]
+  files: [
+    rtl/acc_ram.v,
+    rtl/ALU.v,
+    rtl/clock_gate.v,
+    rtl/controller.v,
+    rtl/wb.v,
+    rtl/A_buffer.v,
+    rtl/X_buffer.v,
+    rtl/acc_top.v,
+  ]
