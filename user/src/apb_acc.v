@@ -2,13 +2,13 @@
 `define ACC_EN_VALUE               32'd1    // enable clock gating
 `define ACC_END_VALUE              32'd0    // disable clock gating
 
-`define ACC_EN_ADDR                13'h1FF0
-`define ACC_LOAD_A_ADDR            13'h1FF4    // load A to ALU
-`define ACC_LOAD_X_ADDR            13'h1FF8    // load X to ALU
+`define ACC_EN_ADDR                12'hFF0
+`define ACC_LOAD_A_ADDR            12'hFF4    // load A to ALU
+`define ACC_LOAD_X_ADDR            12'hFF8    // load X to ALU
 `timescale 1ns / 1ns
 module apb_acc
 #(
-    parameter APB_ADDR_WIDTH = 13  //APB slaves are 8KB by default
+    parameter APB_ADDR_WIDTH = 12  //APB slaves are 4KB by default
 )(
     input                        HCLK,
     input                        HRESETn,
@@ -33,7 +33,7 @@ assign write_X_n = acc_write && (PADDR == `ACC_LOAD_X_ADDR) ? 1'b1 : 1'b0;
 
 //read enable and write enable
 wire   read_n;
-assign read_n  = (PSEL && PENABLE && !PWRITE) ? 1'b1 : 1'b0;
+assign read_n  = (PSEL && PENABLE && !PWRITE);
 wire   rst;
 
 clock_gate clk_gate_inst (
@@ -47,14 +47,13 @@ clock_gate clk_gate_inst (
 );
 
 // output mux
-//reg pslverr;
 wire ry_o; 
 wire pready;
 wire [31:0] prdata;
 assign PRDATA   = prdata;
 //assign PRDATA   = read_n ? prdata : 32'b0;
 //assign PSELVERR = PSEL ? pslverr : 1'b0;
-assign PSLVERR  = 1'b0;
+assign PSLVERR  = 1'b1 ? 1'b0 : 1'b1; // always no error
 assign PREADY   = read_n ?  ry_o : pready;
 //assign PREADY   = 1'b1;
 
@@ -104,7 +103,7 @@ A_buffer u_A_buffer(
 	.rst        	( rst         ),
 	.PWDATA     	( PWDATA      ),
 	.valid_input 	( write_A_n   ),
-	.load_A_en 	( load_A_en   ),
+	.load_A_en     	( load_A_en   ),
 	.load_A_done    ( load_A_done ),
 	.A_input    	( A_input     )
 );
@@ -139,11 +138,11 @@ wb u_wb(
 
 acc_ram u_acc_ram(
         .clk     	( clk           ),
-        .rst        	( rst           ),
+        .rst            ( rst           ),
 	.en_i    	( web||read_n   ),
 	.we_i    	( ~web          ),
 	.w_addr_i  	( w_addr        ),
-	.r_addr_i  	( PADDR[11:0]   ),
+	.r_addr_i  	( PADDR         ),
 	.wdata_i 	( dataRAM       ),
 	.rdata_o 	( prdata        ),
         .ry_o           ( ry_o          )

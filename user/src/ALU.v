@@ -29,8 +29,8 @@ module ALU(
     reg [16:0]  MU8_r;
     reg [16:0]  MU9_r;
 
-    reg [19:0]  MU1_next,MU2_next,MU3_next,MU4_next;
-    reg [19:0]  MU5_next,MU6_next,MU7_next,MU8_next,MU9_next;
+    reg [16:0]  MU1_next,MU2_next,MU3_next,MU4_next;
+    reg [16:0]  MU5_next,MU6_next,MU7_next,MU8_next,MU9_next;
     
     //adder trees
     wire [17:0] sum0 = MU1_r + MU2_r;
@@ -48,9 +48,9 @@ module ALU(
     always @(posedge clk or negedge rst) begin
         if(!rst) begin
             web   <= 0; 
-            MU1_r <= 0; MU2_r <= 0; MU3_r <= 0; MU4_r <= 0;
-            MU5_r <= 0; MU6_r <= 0; MU7_r <= 0;
-            MU8_r <= 0; MU9_r <= 0;
+            MU1_r <= 17'b0; MU2_r <= 17'b0; MU3_r <= 17'b0; MU4_r <= 17'b0;
+            MU5_r <= 17'b0; MU6_r <= 17'b0; MU7_r <= 17'b0;
+            MU8_r <= 17'b0; MU9_r <= 17'b0;
         end
         else begin
             //web_r <= web_r_next;
@@ -83,9 +83,9 @@ module ALU(
         end
         else begin
             // Reset the MU registers.
-            MU1_next = 18'b0; MU2_next = 18'b0; MU3_next = 18'b0; MU4_next = 18'b0;
-            MU5_next = 18'b0; MU6_next = 18'b0; MU7_next = 18'b0;
-            MU8_next = 18'b0; MU9_next = 18'b0;
+            MU1_next = 17'b0; MU2_next = 17'b0; MU3_next = 17'b0; MU4_next = 17'b0;
+            MU5_next = 17'b0; MU6_next = 17'b0; MU7_next = 17'b0;
+            MU8_next = 17'b0; MU9_next = 17'b0;
         end
     end 
 

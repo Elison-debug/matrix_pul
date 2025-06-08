@@ -13,13 +13,12 @@ module wb(
     reg wb_state;
 
     //ram address
-    reg [11:0] ram_addr;
-    reg [11:0] ram_addr_next;
-    assign w_addr = ram_addr_next;
-
+    reg  [11:0] ram_addr;
+    wire [11:0] ram_addr_next;
+    assign w_addr = ram_addr;
+    assign ram_addr_next  = web ? ram_addr + 12'd4 : ram_addr ; //if ram en then count else wait
     //dataRAM and ram enable signal
-    assign dataRAM[31:20] = 12'b0;
-    assign dataRAM[19: 0] = sum;
+    assign dataRAM = {12'b0,sum};
 
 always @(posedge clk or negedge rst) begin
     if(!rst) begin
@@ -30,9 +29,7 @@ always @(posedge clk or negedge rst) begin
     end
 end
 
-always @(*) begin
-    ram_addr_next  = ram_addr;
-    ram_addr_next  = web ? ram_addr + 12'd4 : ram_addr ; //if ram en then count else wait
-end
+
+
 
 endmodule

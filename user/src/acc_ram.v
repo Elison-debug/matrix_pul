@@ -18,8 +18,9 @@ module acc_ram#(
   wire ry_count_next;
 
   wire LOW = 1'b0;
-  wire [31:0] byte_rdata;
-
+  wire [31:0] rdata;
+  wire [23:0] byte_rdata;
+  assign rdata = {8'b0,byte_rdata};
   wire [APB_ADDR_WIDTH-1:0]  addr;
   assign addr = we_i ?  r_addr_i : w_addr_i;
   assign ry_o = (ry_count == 1'b1);
@@ -35,7 +36,7 @@ end
   
   genvar i;
   generate
-    for (i = 0; i < 4; i = i + 1) begin : ram_byte
+    for (i = 0; i < 3; i = i + 1) begin : ram_byte
       ST_SPHDL_2048x8m8_L sram_2k (
         .Q        ( byte_rdata[(i+1)*8-1 -: 8]),
         .RY       (                ),
